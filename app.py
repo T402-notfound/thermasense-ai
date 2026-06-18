@@ -55,19 +55,16 @@ input_press = st.sidebar.slider("Pression du fluide (Bar)", 0.5, 6.0, 4.0)
 # ----------------------------------------------------
 # MODULE 1: Machine Learning Anomaly Detection (Isolation Forest)
 # ----------------------------------------------------
-# Base training set (Normal operating envelope)
 np.random.seed(101)
 normal_temps = np.random.normal(loc=52.0, scale=2.0, size=200)
 normal_press = np.random.normal(loc=4.0, scale=0.3, size=200)
 training_data = pd.DataFrame({"Temperature": normal_temps, "Pressure": normal_press})
 
-# Live Model Compilation
 ai_engine = IsolationForest(contamination=0.05, random_state=42)
 ai_engine.fit(training_data)
 
-# Real-Time Inference
 current_metrics = pd.DataFrame({"Temperature": [input_temp], "Pressure": [input_press]})
-inference_result = ai_engine.predict(current_metrics)[0] # 1 = Normal, -1 = Anomaly
+inference_result = ai_engine.predict(current_metrics)[0]
 
 is_leak = True if inference_result == -1 else False
 financial_impact = int(max(0, (input_temp - 52.0) * 15.5)) if is_leak else 0
@@ -85,7 +82,6 @@ with col3:
     else:
         st.markdown('<div class="metric-box"><h4>✅ Statut Efficacité Énergétique</h4><h3 style="color:#10b981; margin-top:10px;">Régime Stable — 0 DH/h Loss</h3></div>', unsafe_allow_html=True)
 
-# Historical Datastream Rendering
 time_axis = [datetime.datetime.now() - datetime.timedelta(minutes=i*5) for i in range(30)]
 time_axis.reverse()
 live_stream = list(np.random.normal(loc=52.0, scale=1.5, size=29)) + [input_temp]
@@ -106,7 +102,6 @@ with col_src:
 
 with col_snk:
     st.write("### 🤖 Algorithme d'Allocation")
-    
     industrial_sinks = [
         {"name": "Bassin de Lavage Industriel", "min_temp": 55.0},
         {"name": "Préchauffage Eau Chaudière", "min_temp": 40.0}
