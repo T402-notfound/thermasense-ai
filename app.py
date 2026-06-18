@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import datetime
 
 # --- PAGE CONFIGURATION ---
 st.set_page_config(page_title="ThermaSense AI - Multi-Grid Platform", layout="wide")
@@ -39,18 +38,16 @@ st.sidebar.header("🕹️ Configuration Live Ingestion")
 clinker_load = st.sidebar.slider("Charge du Four à Ciment (%)", 40, 100, 85)
 
 # --- GLOBAL CALCULATION MATRIX ---
-# Dynamic baseline generated from the slider
-total_energy_recovered = int(clinker_load * 12.5) # Max 1250 kW
+total_energy_recovered = int(clinker_load * 12.5) 
 water_heating_internal = int(total_energy_recovered * 0.15)
 drying_internal = int(total_energy_recovered * 0.45)
 factory_total_internal = water_heating_internal + drying_internal
 
 farms_allocated_energy = total_energy_recovered - factory_total_internal
-losses_atmospheric = 0 if farms_allocated_energy >= 0 else abs(farms_allocated_energy)
 
 # Financial rates (MAD per kWh)
-traditional_energy_cost = 0.85 # Standard industrial Grid/Gas rate in Morocco
-agro_discounted_rate = 0.35    # Attractive, cheap green rate for nearby farmers
+traditional_energy_cost = 0.85 
+agro_discounted_rate = 0.35    
 
 factory_hourly_savings = int(factory_total_internal * traditional_energy_cost)
 farms_hourly_revenue = int(farms_allocated_energy * agro_discounted_rate)
@@ -79,10 +76,11 @@ with tab1:
     with c2:
         st.markdown(f'<div class="metric-card"><h4>Préchauffage Eau & Séchage</h4><h2>{factory_total_internal} kW</h2><small>Eau ({water_heating_internal} kW) | Séchage ({drying_internal} kW)</small></div>', unsafe_allow_html=True)
     with c3:
-        st.markdown(f'<div class="metric-card-money"><h4>OPEX Substitué Évité</h4><h2>+ {factory_savings} DH/h</h2><small>Économie d\'énergie fossile classique</small></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="metric-card-money"><h4>OPEX Substitué Évité</h4><h2>+ {factory_hourly_savings} DH/h</h2><small>Économie d\'énergie fossile classique</small></div>', unsafe_allow_html=True)
     
     st.subheader("🔮 Prévisions d'Économies Internes Hebdomadaires (Next 7 Days)")
     days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+    np.random.seed(42) 
     pred_factory_savings = [factory_hourly_savings * 24 * np.random.uniform(0.9, 1.1) for _ in range(7)]
     df_factory = pd.DataFrame({'Jours': days, 'Économies Générées (DH)': pred_factory_savings}).set_index('Jours')
     st.bar_chart(df_factory)
@@ -152,7 +150,7 @@ with tab4:
     with cy2:
         st.markdown(f'<div class="metric-card-money"><h4>Gains Globaux (Annuel)</h4><h2>{total_annual_impact:,} DH / an</h2><small>Économies ({annual_savings:,} DH) | Ventes ({annual_revenue:,} DH)</small></div>', unsafe_allow_html=True)
     with cy3:
-        st.markdown(f'<div class="metric-box-danger" style="background-color:#1f2937; padding:20px; border-radius:10px; border-left:5px solid #ef4444;"><h4>Émissions CO2 Évitées</h4><h2>~ 648 Tonnes / an</h2><small>Impact environnemental direct</small></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="box-report" style="border-left: 5px solid #ef4444; margin-top:0px;"><h4>Émissions CO2 Évitées</h4><h2>~ 648 Tonnes / an</h2><small>Impact environnemental direct</small></div>', unsafe_allow_html=True)
 
     st.write("---")
     st.subheader("🔮 Vision Prédictive et Planification Stratégique pour l'Année Suivante (2027)")
@@ -160,7 +158,7 @@ with tab4:
     col_v1, col_v2 = st.columns(2)
     with col_v1:
         st.write("### 📈 Trajectoire de Rationalisation de la Consommation")
-        st.info("🤖 **Analyse Prédictive de l'IA :** En optimisant les cycles de séchage de la matière première selon les prévisions de production de l'année prochaine, la cimenterie peut augmenter son taux d'auto-suffisance de **4.2%** supplémentaires, réduisant le recours aux énergies fossiles d'appoint.")
+        st.info("🤖 **Analyse Prédictive de l'IA :** En optimisant les cycles de séchage de la matière première selon les prévisions de production de l'année prochaine, la cimenterie can augmenter son taux d'auto-suffisance de **4.2%** supplémentaires, réduisant le recours aux énergies fossiles d'appoint.")
     with col_v2:
         st.markdown(f"""
         <div class="box-report">
