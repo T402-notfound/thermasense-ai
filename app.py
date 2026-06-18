@@ -4,9 +4,9 @@ import numpy as np
 import datetime
 
 # --- PAGE CONFIGURATION ---
-st.set_page_config(page_title="ThermaSense AI - Executive Dashboard", layout="wide")
+st.set_page_config(page_title="ThermaSense AI - Multi-Grid Platform", layout="wide")
 
-# --- CUSTOM CLEAN DARK THEME CSS ---
+# --- CUSTOM DEEP DARK THEME CSS ---
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
@@ -15,116 +15,159 @@ st.markdown("""
         background-color: #0e1117;
         color: #eceff4;
     }
-    .metric-box {
+    .metric-card {
         background-color: #1f2937; padding: 20px; border-radius: 10px;
         border-left: 5px solid #3b82f6; margin-bottom: 15px;
     }
-    .metric-box-agro {
+    .metric-card-agro {
         background-color: #1f2937; padding: 20px; border-radius: 10px;
         border-left: 5px solid #10b981; margin-bottom: 15px;
     }
-    .metric-box-money {
+    .metric-card-money {
         background-color: #1f2937; padding: 20px; border-radius: 10px;
         border-left: 5px solid #eab308; margin-bottom: 15px;
     }
-    .report-box {
+    .box-report {
         background-color: #111827; padding: 20px; border-radius: 8px;
         border: 1px solid #4b5563; margin-top: 15px;
     }
     </style>
 """, unsafe_allow_html=True)
 
-# --- HEADER ---
-st.title("🏭 Cimenterie & Éco-Système Agricole — ThermaSense AI")
-st.markdown("<h4 style='color:#9ca3af;'>Interface de Gestion et de Routage Énergétique (MVP Live Demo)</h4>", unsafe_allow_html=True)
+# --- SIDEBAR CONTROL UNIT ---
+st.sidebar.header("🕹️ Configuration Live Ingestion")
+clinker_load = st.sidebar.slider("Charge du Four à Ciment (%)", 40, 100, 85)
+
+# --- GLOBAL CALCULATION MATRIX ---
+# Dynamic baseline generated from the slider
+total_energy_recovered = int(clinker_load * 12.5) # Max 1250 kW
+water_heating_internal = int(total_energy_recovered * 0.15)
+drying_internal = int(total_energy_recovered * 0.45)
+factory_total_internal = water_heating_internal + drying_internal
+
+farms_allocated_energy = total_energy_recovered - factory_total_internal
+losses_atmospheric = 0 if farms_allocated_energy >= 0 else abs(farms_allocated_energy)
+
+# Financial rates (MAD per kWh)
+traditional_energy_cost = 0.85 # Standard industrial Grid/Gas rate in Morocco
+agro_discounted_rate = 0.35    # Attractive, cheap green rate for nearby farmers
+
+factory_hourly_savings = int(factory_total_internal * traditional_energy_cost)
+farms_hourly_revenue = int(farms_allocated_energy * agro_discounted_rate)
+
+# --- SYSTEM TITLE ---
+st.title("🏭 Plateforme ThermaSense AI — Éco-Système Global")
+st.markdown("<h4>Routage Algorithmique & Optimisation Inter-Sectorielle (Cimenterie + Agro)</h4>", unsafe_allow_html=True)
 st.write("---")
 
-# --- SIDEBAR INTERACTIVE CONTROLS FOR THE PITCH ---
-st.sidebar.header("🕹️ Simulateur Live (Pour le Jury)")
-st.sidebar.write("Modifiez la production du four pour voir l'adaptation instantanée du système :")
+# --- NAVIGATION TABS SYSTEM (4 INTERFACES) ---
+tab1, tab2, tab3, tab4 = st.tabs([
+    "🏢 1. Optimisation Interne Usine", 
+    "🚜 2. Consommation & Vente Mazarie", 
+    "🗓️ 3. Variabilité Saisonnière (Hiver/Été)", 
+    "📊 4. Rapport Annuel & Vision Predictive"
+])
 
-# One main slider to control the whole demo logic live
-clinker_production_load = st.sidebar.slider("Charge de Production du Four (%)", 40, 100, 85)
-season = st.sidebar.selectbox("Saison Actuelle :", ["Hiver (Winter)", "Intersaison", "Été (Summer)"])
-
-# --- LIVE MATHEMATICAL SIMULATION LOGIC (Fast & Lightweight) ---
-# Total energy generated is directly proportional to furnace load
-total_energy = int(clinker_production_load * 11.2) # e.g., 85% * 11.2 = 952 kW
-internal_water_heating = int(total_energy * 0.15)  # 15% always goes to water heating
-
-if season == "Hiver (Winter)":
-    farm_demand = 450
-    drying_allocated = max(50, total_energy - internal_water_heating - farm_demand)
-    farm_allocated = total_energy - internal_water_heating - drying_allocated
-elif season == "Été (Summer)":
-    farm_demand = 80
-    farm_allocated = farm_demand
-    drying_allocated = total_energy - internal_water_heating - farm_allocated
-else:
-    farm_demand = 250
-    drying_allocated = max(200, int(total_energy * 0.4))
-    farm_allocated = total_energy - internal_water_heating - drying_allocated
-
-# Financial Modeling (MAD/h)
-factory_savings = int((internal_water_heating + drying_allocated) * 0.45) # Fossil fuel substituted
-farm_revenue = int(farm_allocated * 0.30) # Green heat sold to farmers
-total_financial_gain = factory_savings + farm_revenue
-
-# Predictions for the next shifts (AI forecasting mock based on load)
-pred_next_production = int(total_energy * 1.05)
-pred_next_farm_demand = int(farm_demand * 0.9) if season != "Hiver (Winter)" else farm_demand
-
-# --- MODULE 1: PRODUCTION & CONSOMMATION (⚡ ENERGIE) ---
-st.subheader("⚡ 1. Flux Énergétiques en Temps Réel")
-col1, col2, col3, col4 = st.columns(4)
-
-with col1:
-    st.markdown(f'<div class="metric-box"><h4>Énergie Capturée</h4><h2>{total_energy} kW</h2><small>Source: Échappement Four</small></div>', unsafe_allow_html=True)
-with col2:
-    st.markdown(f'<div class="metric-box"><h4>Préchauffage Eau</h4><h2>{internal_water_heating} kW</h2><small>Consommation Usine</small></div>', unsafe_allow_html=True)
-with col3:
-    st.markdown(f'<div class="metric-box"><h4>Séchage Matière</h4><h2>{drying_allocated} kW</h2><small>Consommation Usine</small></div>', unsafe_allow_html=True)
-with col4:
-    st.markdown(f'<div class="metric-box-agro"><h4>Routage Mazarie</h4><h2>{farm_allocated} kW</h2><small>Demande Agricole</small></div>', unsafe_allow_html=True)
-
-# --- MODULE 2: REVENUS & OPEX (💰 GAINS ET PERTES) ---
-st.write("---")
-st.subheader("💰 2. Impact Financier Horaire")
-col_f1, col_f2, col_f3 = st.columns(3)
-
-with col_f1:
-    st.markdown(f'<div class="metric-box-money"><h4>Économies Cimenterie</h4><h2>+ {factory_savings} DH/h</h2><small>Charbon/Fioul évité</small></div>', unsafe_allow_html=True)
-with col_f2:
-    st.markdown(f'<div class="metric-box-money"><h4>Facturation Mazarie</h4><h2>+ {farm_revenue} DH/h</h2><small>Chaleur verte vendue</small></div>', unsafe_allow_html=True)
-with col_f3:
-    st.markdown(f'<div class="metric-box-money" style="border-left: 5px solid #10b981;"><h4>Gain Économique Total</h4><h2>{total_financial_gain} DH/h</h2><small>Valorisation nette</small></div>', unsafe_allow_html=True)
-
-# --- MODULE 3: PREDICTIONS FUTURE & SEASONS (🔮 PREVISIONS AI) ---
-st.write("---")
-st.subheader("🔮 3. Prévisions Prédictives (AI Next 24h)")
-col_p1, col_p2 = st.columns(2)
-
-with col_p1:
-    st.write("### 📈 Tendances de Production Estimées")
-    st.info(f"Modèle prédictif estime une hausse de production à **{pred_next_production} kW** pour le prochain shift basé sur le planning des fours.")
+# ==========================================
+# INTERFACE 1: CIMENTERIE (INTERNAL)
+# ==========================================
+with tab1:
+    st.header("🏢 Consommation et Économies Internes de la Cimenterie")
+    c1, c2, c3 = st.columns(3)
+    with c1:
+        st.markdown(f'<div class="metric-card"><h4>Énergie Totale Capturée</h4><h2>{total_energy_recovered} kW</h2><small>Flux exergétique brut récupéré</small></div>', unsafe_allow_html=True)
+    with c2:
+        st.markdown(f'<div class="metric-card"><h4>Préchauffage Eau & Séchage</h4><h2>{factory_total_internal} kW</h2><small>Eau ({water_heating_internal} kW) | Séchage ({drying_internal} kW)</small></div>', unsafe_allow_html=True)
+    with c3:
+        st.markdown(f'<div class="metric-card-money"><h4>OPEX Substitué Évité</h4><h2>+ {factory_savings} DH/h</h2><small>Économie d\'énergie fossile classique</small></div>', unsafe_allow_html=True)
     
-    # Simple interactive chart showing stability
-    chart_data = pd.DataFrame({
-        'Heures': ['-12h', '-8h', '-4h', 'Actuel', '+4h (Pred)', '+8h (Pred)'],
-        'Énergie (kW)': [total_energy-20, total_energy+10, total_energy-5, total_energy, pred_next_production, pred_next_production-10]
-    }).set_index('Heures')
-    st.line_chart(chart_data)
+    st.subheader("🔮 Prévisions d'Économies Internes Hebdomadaires (Next 7 Days)")
+    days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+    pred_factory_savings = [factory_hourly_savings * 24 * np.random.uniform(0.9, 1.1) for _ in range(7)]
+    df_factory = pd.DataFrame({'Jours': days, 'Économies Générées (DH)': pred_factory_savings}).set_index('Jours')
+    st.bar_chart(df_factory)
 
-with col_p2:
-    st.write("### 📉 Prévisions de Demande Agricole")
-    st.success(f"La demande des coopératives agricoles stabilisera autour de **{pred_next_farm_demand} kW** selon les données météo saisonnières.")
+# ==========================================
+# INTERFACE 2: AGRO / MAZARIE (EXTERNAL)
+# ==========================================
+with tab2:
+    st.header("🚜 Consommation du Secteur Agricole Local & Facturation")
+    ca1, ca2, ca3 = st.columns(3)
+    with ca1:
+        st.markdown(f'<div class="metric-card-agro"><h4>Flux Routé vers les Mazarie</h4><h2>{farms_allocated_energy} kW</h2><small>Surplus thermique injecté en direct</small></div>', unsafe_allow_html=True)
+    with ca2:
+        st.markdown(f'<div class="metric-card-agro"><h4>Tarif Réduit Offert (Agro)</h4><h2>{agro_discounted_rate} DH / kWh</h2><small>Prix standard réseau : {traditional_energy_cost} DH/kWh (Offre Attractive)</small></div>', unsafe_allow_html=True)
+    with ca3:
+        st.markdown(f'<div class="metric-card-money"><h4>Revenus de Facturation</h4><h2>+ {farms_hourly_revenue} DH/h</h2><small>Gains secondaires pour la cimenterie</small></div>', unsafe_allow_html=True)
     
-    # Monthly synthetic summary report at the bottom of predictions
-    st.markdown(f"""
-    <div class="report-box">
-        <strong>📋 Rapport Mensuel Estimé (Cimenterie + Mazarie) :</strong><br>
-        • Énergie totale valorisée : <b>{(total_energy * 24 * 30):,} kWh / mois</b><br>
-        • Réduction CO2 globale : <b>~ 54 Tonnes évitées</b><br>
-        • Total Gains & Facturation : <b>{(total_financial_gain * 24 * 30):,} DH / mois</b>
-    </div>
-    """, unsafe_allow_html=True)
+    st.subheader("⏰ Prévisions de Demande et Consommation Hebdomadaire par Profil Journalier")
+    hours_profile = ['Matin (Morning)', 'Midi (Noon)', 'Soir (Evening)', 'Nuit (Night)']
+    pred_agro_demand = [farms_allocated_energy * 0.8, farms_allocated_energy * 0.4, farms_allocated_energy * 1.2, farms_allocated_energy * 1.5]
+    df_agro = pd.DataFrame({'Période de la Journée': hours_profile, 'Consommation Estimée (kW)': pred_agro_demand}).set_index('Période de la Journée')
+    st.line_chart(df_agro)
+
+# ==========================================
+# INTERFACE 3: SEASONAL VARIABILITY
+# ==========================================
+with tab3:
+    st.header("🗓️ Matrice Comparative de Consommation Selon les Saisons")
+    st.write("Analyse macro-technique croisée de l'équilibre Offre/Demande (Usine + Mazarie)")
+    
+    col_s1, col_s2 = st.columns(2)
+    with col_s1:
+        st.subheader("❄️ Profil Type : Saison d'Hiver")
+        st.markdown("""
+        * **Demande Agricole (Serres) :** Maximale (Besoin de chauffage critique la nuit).
+        * **Routage :** Priorité absolue donnée au réseau externe des coopératives.
+        * **Gains de Facturation :** Très Élevés (+30% de revenus secondaires).
+        * **Séchage Usine :** Réduit au minimum technique nominal.
+        """)
+        chart_winter = pd.DataFrame({'Flux': ['Eau Usine', 'Séchage Usine', 'Mazarie'], 'kW': [water_heating_internal, drying_internal * 0.5, farms_allocated_energy * 1.5]}).set_index('Flux')
+        st.bar_chart(chart_winter, color="#3b82f6")
+
+    with col_s2:
+        st.subheader("☀️ Profil Type : Saison d'Été")
+        st.markdown("""
+        * **Demande Agricole (Serres) :** Minimale (Uniquement séchage de récoltes ponctuel).
+        * **Routage :** Ré-aiguillage du surplus en interne vers les broyeurs de l'usine.
+        * **Économies Usine :** Maximales (Zéro perte atmosphérique, optimisation OPEX interne).
+        * **Gains de Facturation :** Modérés mais stables.
+        """)
+        chart_summer = pd.DataFrame({'Flux': ['Eau Usine', 'Séchage Usine', 'Mazarie'], 'kW': [water_heating_internal, drying_internal * 1.3, farms_allocated_energy * 0.2]}).set_index('Flux')
+        st.bar_chart(chart_summer, color="#10b981")
+
+# ==========================================
+# INTERFACE 4: ANNUAL & PREDICTIVE VISION
+# ==========================================
+with tab4:
+    st.header("📊 Bilan Énergétique Annuel & Rétrospective Prédictive (Y+1)")
+    
+    cy1, cy2, cy3 = st.columns(3)
+    annual_savings = factory_hourly_savings * 24 * 365
+    annual_revenue = farms_hourly_revenue * 24 * 365
+    total_annual_impact = annual_savings + annual_revenue
+    
+    with cy1:
+        st.markdown(f'<div class="metric-card-money" style="border-left:5px solid #eceff4;"><h4>Énergie Annuelle Valorisée</h4><h2>{(total_energy_recovered * 24 * 365):,} kWh</h2><small>Bilan consolidé Usine + Agro</small></div>', unsafe_allow_html=True)
+    with cy2:
+        st.markdown(f'<div class="metric-card-money"><h4>Gains Globaux (Annuel)</h4><h2>{total_annual_impact:,} DH / an</h2><small>Économies ({annual_savings:,} DH) | Ventes ({annual_revenue:,} DH)</small></div>', unsafe_allow_html=True)
+    with cy3:
+        st.markdown(f'<div class="metric-box-danger" style="background-color:#1f2937; padding:20px; border-radius:10px; border-left:5px solid #ef4444;"><h4>Émissions CO2 Évitées</h4><h2>~ 648 Tonnes / an</h2><small>Impact environnemental direct</small></div>', unsafe_allow_html=True)
+
+    st.write("---")
+    st.subheader("🔮 Vision Prédictive et Planification Stratégique pour l'Année Suivante (2027)")
+    
+    col_v1, col_v2 = st.columns(2)
+    with col_v1:
+        st.write("### 📈 Trajectoire de Rationalisation de la Consommation")
+        st.info("🤖 **Analyse Prédictive de l'IA :** En optimisant les cycles de séchage de la matière première selon les prévisions de production de l'année prochaine, la cimenterie peut augmenter son taux d'auto-suffisance de **4.2%** supplémentaires, réduisant le recours aux énergies fossiles d'appoint.")
+    with col_v2:
+        st.markdown(f"""
+        <div class="box-report">
+            <h4>📋 Plan d'Action Stratégique (AI Insights)</h4>
+            <hr style='border-color:#4b5563;'>
+            • <b>Extension Réseau :</b> Intégrer 3 nouvelles coopératives agricoles au réseau de chaleur d'ici Q2.<br>
+            • <b>Régulation Dynamique :</b> Automatisation complète des vannes d'aiguillage thermique via le jumeau numérique.<br>
+            • <b>Target ROI :</b> Amortissement complet des infrastructures physiques de routage atteint en <b>14 mois</b>.
+        </div>
+        """, unsafe_allow_html=True)
