@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 
 # --- PAGE CONFIGURATION ---
-st.set_page_config(page_title="ThermaSense AI - Multi-Grid Platform", layout="wide")
+st.set_page_config(page_title="ThermaSense AI - Industrial Grid", layout="wide")
 
 # --- CUSTOM DEEP DARK THEME CSS ---
 st.markdown("""
@@ -13,6 +13,13 @@ st.markdown("""
         font-family: 'Inter', sans-serif;
         background-color: #0e1117;
         color: #eceff4;
+    }
+    /* تحسين شكل الأزرار الجانبية للتنقل */
+    div.row-widget.stRadio > div{
+        background-color: #111827;
+        padding: 10px;
+        border-radius: 8px;
+        border: 1px solid #374151;
     }
     .metric-card {
         background-color: #1f2937; padding: 20px; border-radius: 10px;
@@ -33,9 +40,43 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- SIDEBAR CONTROL UNIT ---
-st.sidebar.header("🕹️ Configuration Live Ingestion")
+# --- GLOBAL SYSTEM TITLE IN MAIN AREA ---
+st.title("🏭 Plateforme ThermaSense AI")
+st.markdown("<h4 style='color:#9ca3af; margin-top:-15px;'>Routage Algorithmique & Optimisation Inter-Sectorielle (Cimenterie + Agro)</h4>", unsafe_allow_html=True)
+st.write("---")
+
+# ==========================================
+# SIDEBAR CONTROL & NAVIGATION UNIT
+# ==========================================
+st.sidebar.image("https://img.icons8.com/external-flatart-icons-flat-flatarticons/128/external-factory-industry-flatart-icons-flat-flatarticons.png", width=70)
+st.sidebar.title("🎛️ Centre de Contrôle")
+st.sidebar.write("---")
+
+# 1. لوحة التنقل الرئيسية الجانبية (بديل الـ Tabs)
+st.sidebar.subheader("📂 Navigation")
+navigation_page = st.sidebar.radio(
+    "Sélectionnez une interface :",
+    [
+        "🏢 1. Optimisation Interne Usine", 
+        "🚜 2. Consommation & Vente Mazarie", 
+        "🗓️ 3. Variabilité Saisonnière", 
+        "📊 4. Rapport Annuel & Vision"
+    ]
+)
+
+st.sidebar.write("---")
+
+# 2. متحكمات المحاكاة الحية أثناء الـ Pitch
+st.sidebar.subheader("🕹️ Configuration Live Ingestion")
 clinker_load = st.sidebar.slider("Charge du Four à Ciment (%)", 40, 100, 85)
+
+# باقة حية لتعزيز شكل الـ SCADA Stream
+st.sidebar.markdown("""
+<div style='background-color:#111827; padding:10px; border-radius:5px; border-left:3px solid #10b981;'>
+<small style='color:#10b981;'>● SCADA Stream Live</small><br>
+<small style='color:#9ca3af;'>Status: Connected to Kiln 1</small>
+</div>
+""", unsafe_allow_html=True)
 
 # --- GLOBAL CALCULATION MATRIX ---
 total_energy_recovered = int(clinker_load * 12.5) 
@@ -52,23 +93,13 @@ agro_discounted_rate = 0.35
 factory_hourly_savings = int(factory_total_internal * traditional_energy_cost)
 farms_hourly_revenue = int(farms_allocated_energy * agro_discounted_rate)
 
-# --- SYSTEM TITLE ---
-st.title("🏭 Plateforme ThermaSense AI — Éco-Système Global")
-st.markdown("<h4>Routage Algorithmique & Optimisation Inter-Sectorielle (Cimenterie + Agro)</h4>", unsafe_allow_html=True)
-st.write("---")
-
-# --- NAVIGATION TABS SYSTEM (4 INTERFACES) ---
-tab1, tab2, tab3, tab4 = st.tabs([
-    "🏢 1. Optimisation Interne Usine", 
-    "🚜 2. Consommation & Vente Mazarie", 
-    "🗓️ 3. Variabilité Saisonnière (Hiver/Été)", 
-    "📊 4. Rapport Annuel & Vision Predictive"
-])
 
 # ==========================================
-# INTERFACE 1: CIMENTERIE (INTERNAL)
+# RENDER PAGES BASED ON SIDEBAR SELECTION
 # ==========================================
-with tab1:
+
+# 🏢 الواجهة الأولى: المصنع
+if navigation_page == "🏢 1. Optimisation Interne Usine":
     st.header("🏢 Consommation et Économies Internes de la Cimenterie")
     c1, c2, c3 = st.columns(3)
     with c1:
@@ -85,10 +116,8 @@ with tab1:
     df_factory = pd.DataFrame({'Jours': days, 'Économies Générées (DH)': pred_factory_savings}).set_index('Jours')
     st.bar_chart(df_factory)
 
-# ==========================================
-# INTERFACE 2: AGRO / MAZARIE (EXTERNAL)
-# ==========================================
-with tab2:
+# 🚜 الواجهة الثانية: المزارع
+elif navigation_page == "🚜 2. Consommation & Vente Mazarie":
     st.header("🚜 Consommation du Secteur Agricole Local & Facturation")
     ca1, ca2, ca3 = st.columns(3)
     with ca1:
@@ -104,10 +133,8 @@ with tab2:
     df_agro = pd.DataFrame({'Période de la Journée': hours_profile, 'Consommation Estimée (kW)': pred_agro_demand}).set_index('Période de la Journée')
     st.line_chart(df_agro)
 
-# ==========================================
-# INTERFACE 3: SEASONAL VARIABILITY
-# ==========================================
-with tab3:
+# 🗓️ الواجهة الثالثة: الفصول
+elif navigation_page == "🗓️ 3. Variabilité Saisonnière":
     st.header("🗓️ Matrice Comparative de Consommation Selon les Saisons")
     st.write("Analyse macro-technique croisée de l'équilibre Offre/Demande (Usine + Mazarie)")
     
@@ -134,10 +161,8 @@ with tab3:
         chart_summer = pd.DataFrame({'Flux': ['Eau Usine', 'Séchage Usine', 'Mazarie'], 'kW': [water_heating_internal, drying_internal * 1.3, farms_allocated_energy * 0.2]}).set_index('Flux')
         st.bar_chart(chart_summer, color="#10b981")
 
-# ==========================================
-# INTERFACE 4: ANNUAL & PREDICTIVE VISION
-# ==========================================
-with tab4:
+# 📊 الواجهة الرابعة: التقرير السنوي والتنبؤ
+elif navigation_page == "📊 4. Rapport Annuel & Vision":
     st.header("📊 Bilan Énergétique Annuel & Rétrospective Prédictive (Y+1)")
     
     cy1, cy2, cy3 = st.columns(3)
@@ -158,7 +183,7 @@ with tab4:
     col_v1, col_v2 = st.columns(2)
     with col_v1:
         st.write("### 📈 Trajectoire de Rationalisation de la Consommation")
-        st.info("🤖 **Analyse Prédictive de l'IA :** En optimisant les cycles de séchage de la matière première selon les prévisions de production de l'année prochaine, la cimenterie can augmenter son taux d'auto-suffisance de **4.2%** supplémentaires, réduisant le recours aux énergies fossiles d'appoint.")
+        st.info("🤖 **Analyse Prédictive de l'IA :** En optimisant les cycles de séchage de la matière première selon les prévisions de production de l'année prochaine, la cimenterie peut augmenter son taux d'auto-suffisance de **4.2%** supplémentaires, réduisant le recours aux énergies fossiles d'appoint.")
     with col_v2:
         st.markdown(f"""
         <div class="box-report">
