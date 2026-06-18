@@ -40,6 +40,10 @@ st.markdown("""
         background-color: #111827; padding: 15px; border-radius: 8px;
         border: 1px solid #374151; text-align: center;
     }
+    .ai-decision-box {
+        background-color: #111827; padding: 20px; border-radius: 8px;
+        border-left: 5px solid #a855f7; margin-bottom: 15px;
+    }
     </style>
 """, unsafe_allow_html=True)
 
@@ -55,7 +59,7 @@ st.sidebar.image("https://img.icons8.com/external-flatart-icons-flat-flatarticon
 st.sidebar.title("🎛️ Control Center")
 st.sidebar.write("---")
 
-# 1. Sidebar Radio Navigation
+# 1. Sidebar Radio Navigation (Updated to 5 interfaces)
 st.sidebar.subheader("📂 Navigation")
 navigation_page = st.sidebar.radio(
     "Select an interface:",
@@ -63,7 +67,8 @@ navigation_page = st.sidebar.radio(
         "🏢 1. Factory Internal Optimization", 
         "🚜 2. Agro Consumption & Billing", 
         "🗓️ 3. Seasonal Variability Matrix", 
-        "📊 4. Annual Report & Predictive Vision"
+        "📊 4. Annual Report & Predictive Vision",
+        "🤖 5. AI Routing Core & Edge Cases"
     ]
 )
 
@@ -115,7 +120,6 @@ if navigation_page == "🏢 1. Factory Internal Optimization":
     with c3:
         st.markdown(f'<div class="metric-card-money"><h4>Substituted OPEX Avoided</h4><h2>+ {factory_hourly_savings} DH/h</h2><small>Saved classical fossil-fuel costs</small></div>', unsafe_allow_html=True)
     
-    # 🤖 جودة الإضافة هنا: عرض حالة الصمامات الأوتوماتيكية الحية بناءً على خوارزمية الـ AI
     st.write("---")
     st.subheader("🤖 Smart Thermal Routing Valves (AI Autonomous Control)")
     st.markdown("<small style='color:#9ca3af;'>Real-time dynamic actuators adjustment based on SCADA feed without human intervention.</small>", unsafe_allow_html=True)
@@ -224,3 +228,91 @@ elif navigation_page == "📊 4. Rapport Annuel & Vision Predictive":
             • <b>Target ROI Schedule:</b> Total physical infrastructure amortization achieved in <b>14 months</b>.
         </div>
         """, unsafe_allow_html=True)
+
+# ==========================================
+# 🤖 NEW!! PAGE 5: AI ROUTING CORE & EDGE CASES (THE ENGINE)
+# ==========================================
+elif navigation_page == "🤖 5. AI Routing Core & Edge Cases":
+    st.header("🤖 Algorithmic Decision Tree & Emergency Edge Cases")
+    st.write("This interactive console demonstrates the neural-logic rules applied by ThermaSense AI when energy balances become critical.")
+    
+    st.write("---")
+    st.subheader("🔮 Select System Critical Scenario to Test AI Resilience")
+    
+    # متحكم تفاعلي لاختبار سيناريوهات الأزمات المختلفة
+    scenario = st.selectbox(
+        "Choose a real-time risk scenario:",
+        [
+            "Scenario A: Normal Steady State (Sufficient Energy Allocation)",
+            "Scenario B: Extreme Low Thermal Capture (Emergency Power Deficit)",
+            "Scenario C: Midnight Frost Shock (Critical Agricultural Crop Emergency)",
+            "Scenario D: Maximum Factory Production Peak (Internal Overdrive Required)"
+        ]
+    )
+    
+    st.write("---")
+    
+    # خوارزمية محاكاة السيناريوهات الخمسة الذكية
+    if scenario == "Scenario A: Normal Steady State (Sufficient Energy Allocation)":
+        st.markdown(f"""
+        <div class="ai-decision-box" style="border-left-color: #10b981;">
+            <h3 style="color:#10b981;">🟢 AI Routing Log: OPTIMAL STEADY RUN</h3>
+            <p><b>Current Input:</b> {total_energy_recovered} kW available from kiln. Baseline criteria satisfied.</p>
+            <hr style="border-color:#374151;">
+            • <b>Priority 1 (Factory Safety):</b> Fulfilled 100% ({water_heating_internal} kW routed to internal pre-heaters).<br>
+            • <b>Priority 2 (Factory Raw Material Drying):</b> Fulfilled 100% ({drying_internal} kW distributed to internal mills).<br>
+            • <b>Priority 3 (Agro Surplus Grid):</b> Fulfilled 100% ({farms_allocated_energy} kW pushed to local greenhouses).<br>
+            <p style="color:#10b981; margin-top:10px;"><b>AI Action:</b> Standard operational routine. Zero energy wasted to atmosphere. Economic secondary revenue loops are optimal.</p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+    elif scenario == "Scenario B: Extreme Low Thermal Capture (Emergency Power Deficit)":
+        # محاكاة حالة الطوارئ إذا انخفضت الطاقة عن الحد الأدنى لتغطية كل المكونات
+        critical_internal_safety = int(total_energy_recovered * 0.4)
+        st.markdown(f"""
+        <div class="ai-decision-box" style="border-left-color: #ef4444;">
+            <h3 style="color:#ef4444;">🔴 AI Routing Log: RISK-MITIGATION MODE (Deficit Triggered)</h3>
+            <p><b>Current Input:</b> Severe drop detected via SCADA stream. Energy insufficient to power all grid sectors simultaneously.</p>
+            <hr style="border-color:#374151;">
+            • <b>Priority 1 - Factory Core Infrastructure Safety:</b> <span style="color:#10b981;">[MAINTAINED]</span> Allocated {critical_internal_safety} kW to prevent cement pre-heater cooling shock.<br>
+            • <b>Priority 2 - Local Agricultural Grid (Mazarie):</b> <span style="color:#eab308;">[SHEDDING TRIGGERED - 50% LOAD CUT]</span> System automatically downscaled heat supply to non-essential crop drying rooms to preserve baseline greenhouse heating loops.<br>
+            • <b>Priority 3 - Factory Raw Material Drying:</b> <span style="color:#ef4444;">[FORCE CLOSED - 0% ALLOCATION]</span> Raw material drying mills completely isolated to prevent core system blackout. Factory falls back on secondary storage silos.<br>
+            <p style="color:#ef4444; margin-top:10px;"><b>AI Action:</b> Valves automated actuators locked to survival configuration. Human operators notified via SCADA stream alert. Crop freezing prevented, industrial core secured.</p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+    elif scenario == "Scenario C: Midnight Frost Shock (Critical Agricultural Crop Emergency)":
+        st.markdown(f"""
+        <div class="ai-decision-box" style="border-left-color: #3b82f6;">
+            <h3 style="color:#3b82f6;">🔵 AI Routing Log: ECO-AGRO CRYOPROTECTION OVERRIDE</h3>
+            <p><b>Current Input:</b> Weather API data detects external ambient temperatures dropping below 2°C. Critical frost threat to regional cooperative greenhouses.</p>
+            <hr style="border-color:#374151;">
+            • <b>AI Dynamic Optimization Rule:</b> Algorithmic routing pivots to protect external consumer assets to maximize contractual premium payouts.<br>
+            • <b>Factory Drying Mills Action:</b> Throttled down by 40% to release extra exergy capacity.<br>
+            • <b>Agro Grid Routing Action:</b> Boosted to maximum allowable pipeline capacity ({farms_allocated_energy * 1.6:.0f} kW) targeting active greenhouse root-zone thermal pads.<br>
+            <p style="color:#3b82f6; margin-top:10px;"><b>AI Action:</b> Autonomous dynamic cross-sectorial shifting. Agricultural assets successfully insulated from frost damage. Secondary factory revenue yields maximized (+35% financial premium earned for peak emergency protection).</p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+    elif scenario == "Scenario D: Maximum Factory Production Peak (Internal Overdrive Required)":
+        st.markdown(f"""
+        <div class="ai-decision-box" style="border-left-color: #eab308;">
+            <h3 style="color:#eab308;">🟡 AI Routing Log: INDUSTRIAL OUTPUT MAXIMIZATION</h3>
+            <p><b>Current Input:</b> Factory ERP log updates target output due to sudden national infrastructure cement demand surge.</p>
+            <hr style="border-color:#374151;">
+            • <b>AI Dynamic Optimization Rule:</b> Factory internal processes take full precedence to eliminate auxiliary fuel purchasing costs (OPEX minimization).<br>
+            • <b>Internal Drying Loops:</b> Expanded to 130% operational nominal capacity to accelerate clinker material processing.<br>
+            • <b>Agro Grid Routing Action:</b> Automated baseline throttling. Agricultural clients shifted to virtual thermal storage reserves to maintain zero industrial performance loss.<br>
+            <p style="color:#eab308; margin-top:10px;"><b>AI Action:</b> Internal OPEX reduction optimized to the absolute maximum. Plant carbon footprint per tonne drops by 12% during peak run. Grid stability verified.</p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+    # عرض هيكلية شجرة القرار للـ AI لتسهيل الفهم البصري على اللجنة
+    st.subheader("📊 AI Logic Architecture Tree Mapping")
+    logic_df = pd.DataFrame({
+        "Condition Trigger": ["Energy > 1000kW", "Energy < 600kW", "Ext Temp < 2°C", "ERP Peak Production"],
+        "Primary Recipient": ["All Sectors (Balanced)", "Factory Core Safety Only", "Agro Greenhouses (Max Override)", "Factory Grinding Mills"],
+        "Secondary Recipient": ["Agro Cooperative Grid", "Agro Baseline Greenhouses", "Factory Core Safety", "Agro Virtual Reserves"],
+        "Shedding / Isolated Target": ["None (Zero Waste)", "Factory Drying Mills (100% Cut)", "Factory Drying Mills (40% Cut)", "Agro Crop Drying Rooms"]
+    })
+    st.table(logic_df)
